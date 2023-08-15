@@ -299,6 +299,17 @@ if (isset($_POST['docsub1'])) {
                 global $con;
                 $query = "select * from doctb";
                 $result = mysqli_query($con, $query);
+                $result_per_page = 10;
+                $total_results = mysqli_num_rows($result);
+                $number_of_pages = ceil($total_results / $result_per_page);
+                if(!isset($_GET['page'])){
+                    $page = 1;
+                }else{
+                    $page = $_GET['page'];
+                }
+                $page_first_result = ($page-1)*$result_per_page;
+                $query = "select * from doctb LIMIT " . $page_first_result . ',' . $result_per_page;
+                $result = mysqli_query($con, $query);
                 while ($row = mysqli_fetch_array($result)) {
                   $username = $row['username'];
                   $spec = $row['spec'];
@@ -319,6 +330,15 @@ if (isset($_POST['docsub1'])) {
               </tbody>
             </table>
             <br>
+              <nav aria-label="Page navigation example">
+                  <ul class="pagination">
+                      <?php
+                      for($p=1;$p<=$number_of_pages;$p++){
+                          echo '<li '.(($p==$page)?'class="page-item active"':"page-item").'><a class="page-link" href="admin-panel.php?page=' . $p . '" '.(($p==$page)?'tabIndex="selected"':"").'>' . $p . '</a></li>';
+                      }
+                      ?>
+                  </ul>
+              </nav>
           </div>
 
 
@@ -353,6 +373,17 @@ if (isset($_POST['docsub1'])) {
                 global $con;
                 $query = "select * from patreg";
                 $result = mysqli_query($con, $query);
+                $result_per_page = 10;
+                $total_results = mysqli_num_rows($result);
+                $number_of_pages = ceil($total_results / $result_per_page);
+                if(!isset($_GET['page'])){
+                    $page = 1;
+                }else{
+                    $page = $_GET['page'];
+                }
+                $page_first_result = ($page-1)*$result_per_page;
+                $query = "select * from patreg LIMIT " . $page_first_result . ',' . $result_per_page;
+                $result = mysqli_query($con, $query);
                 while ($row = mysqli_fetch_array($result)) {
                   $pid = $row['pid'];
                   $fname = $row['fname'];
@@ -377,6 +408,15 @@ if (isset($_POST['docsub1'])) {
               </tbody>
             </table>
             <br>
+              <nav aria-label="Page navigation example">
+                  <ul class="pagination">
+                      <?php
+                      for($p=1;$p<=$number_of_pages;$p++){
+                          echo '<li '.(($p==$page)?'class="page-item active"':"page-item").'><a class="page-link" href="admin-panel.php?page=' . $p . '" '.(($p==$page)?'tabIndex="selected"':"").'>' . $p . '</a></li>';
+                      }
+                      ?>
+                  </ul>
+              </nav>
           </div>
 
 
@@ -485,6 +525,17 @@ if (isset($_POST['docsub1'])) {
 
                 $query = "select * from appointmenttb;";
                 $result = mysqli_query($con, $query);
+                $result_per_page = 10;
+                $total_results = mysqli_num_rows($result);
+                $number_of_pages = ceil($total_results / $result_per_page);
+                if(!isset($_GET['page'])){
+                    $page = 1;
+                }else{
+                    $page = $_GET['page'];
+                }
+                $page_first_result = ($page-1)*$result_per_page;
+                $query = "select * from appointmenttb LIMIT " . $page_first_result . ',' . $result_per_page;
+                $result = mysqli_query($con, $query);
                 while ($row = mysqli_fetch_array($result)) {
                   ?>
                   <tr>
@@ -539,6 +590,15 @@ if (isset($_POST['docsub1'])) {
               </tbody>
             </table>
             <br>
+              <nav aria-label="Page navigation example">
+                  <ul class="pagination">
+                      <?php
+                      for($p=1;$p<=$number_of_pages;$p++){
+                          echo '<li '.(($p==$page)?'class="page-item active"':"page-item").'><a class="page-link" href="admin-panel.php?page=' . $p . '" '.(($p==$page)?'tabIndex="selected"':"").'>' . $p . '</a></li>';
+                      }
+                      ?>
+                  </ul>
+              </nav>
           </div>
 
           <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">...</div>
@@ -622,6 +682,17 @@ if (isset($_POST['docsub1'])) {
 
                 $query = "select * from contact;";
                 $result = mysqli_query($con, $query);
+                $result_per_page = 10;
+                $total_results = mysqli_num_rows($result);
+                $number_of_pages = ceil($total_results / $result_per_page);
+                if(!isset($_GET['page'])){
+                    $page = 1;
+                }else{
+                    $page = $_GET['page'];
+                }
+                $page_first_result = ($page-1)*$result_per_page;
+                $query = "select * from contact LIMIT " . $page_first_result . ',' . $result_per_page;
+                $result = mysqli_query($con, $query);
                 while ($row = mysqli_fetch_array($result)) {
 
                   #$fname = $row['fname'];
@@ -646,7 +717,17 @@ if (isset($_POST['docsub1'])) {
                 <?php } ?>
               </tbody>
             </table>
+              <nav aria-label="Page navigation example">
+                  <ul class="pagination">
+                      <?php
+                      for($p=1;$p<=$number_of_pages;$p++){
+                          echo '<li '.(($p==$page)?'class="page-item active"':"page-item").'><a class="page-link" href="admin-panel.php?page=' . $p . '" '.(($p==$page)?'tabIndex="selected"':"").'>' . $p . '</a></li>';
+                      }
+                      ?>
+                  </ul>
+              </nav>
             <br>
+
           </div>
 
 
