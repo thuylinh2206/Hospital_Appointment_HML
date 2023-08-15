@@ -501,7 +501,7 @@ function get_specs(){
 
                         <td>
                         <?php if(($row['userStatus']==1) && ($row['doctorStatus']==1))  
-                        { ?>
+                         { ?>
 
 													
 	                        <a href="patient-panel.php?ID=<?php echo $row['ID']?>&cancel=update" 
