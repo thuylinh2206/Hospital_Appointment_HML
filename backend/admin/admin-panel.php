@@ -2,33 +2,7 @@
 <?php
 $con = mysqli_connect("localhost", "root", "", "myhmsdb");
 
-include('../progress/newfunc.php');
-
-if (isset($_POST['docsub'])) {
-  $doctor = $_POST['doctor'];
-  $dpassword = $_POST['dpassword'];
-  $demail = $_POST['demail'];
-  $spec = $_POST['special'];
-  $docFees = $_POST['docFees'];
-  $query = "insert into doctb(username,password,email,spec,docFees)values('$doctor','$dpassword','$demail','$spec','$docFees')";
-  $result = mysqli_query($con, $query);
-  if ($result) {
-    echo "<script>alert('Doctor added successfully!');</script>";
-  }
-}
-
-
-if (isset($_POST['docsub1'])) {
-  $demail = $_POST['demail'];
-  $query = "delete from doctb where email='$demail';";
-  $result = mysqli_query($con, $query);
-  if ($result) {
-    echo "<script>alert('Doctor removed successfully!');</script>";
-  } else {
-    echo "<script>alert('Unable to delete!');</script>";
-  }
-}
-
+// include('../progress/newfunc.php');
 
 ?>
 <html lang="en">
@@ -41,7 +15,7 @@ if (isset($_POST['docsub1'])) {
   <link rel="shortcut icon" type="image/x-icon" href="images/favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" type="text/css" href="font-awesome-4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/css/style.css">
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="vendor/fontawesome/css/font-awesome.min.css">
   <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
@@ -141,7 +115,7 @@ if (isset($_POST['docsub1'])) {
           <a class="list-group-item list-group-item-action active" id="list-dash-list" data-toggle="list"
             href="#list-dash" role="tab" aria-controls="home">Dashboard</a>
           <a class="list-group-item list-group-item-action" href="#list-doc" id="list-doc-list" role="tab"
-            aria-controls="home" data-toggle="list">Doctor List</a>
+            aria-controls="home" data-toggle="list">Manage Doctor</a>
           <a class="list-group-item list-group-item-action" href="#list-pat" id="list-pat-list" role="tab"
             data-toggle="list" aria-controls="home">Patient List</a>
           <a class="list-group-item list-group-item-action" href="#list-app" id="list-app-list" role="tab"
@@ -150,10 +124,12 @@ if (isset($_POST['docsub1'])) {
             data-toggle="list" aria-controls="home">Prescription List</a>
           <a class="list-group-item list-group-item-action" href="#list-settings" id="list-adoc-list" role="tab"
             data-toggle="list" aria-controls="home">Add Doctor</a>
-          <a class="list-group-item list-group-item-action" href="#list-settings1" id="list-ddoc-list" role="tab"
+          <a class="list-group-item list-group-item-action" href="#list-doc" id="list-ddoc-list" role="tab"
             data-toggle="list" aria-controls="home">Delete Doctor</a>
+          <a class="list-group-item list-group-item-action" href="#list-doc" id="list-udoc-list" role="tab"
+            data-toggle="list" aria-controls="home">Update Doctor</a>
           <a class="list-group-item list-group-item-action" href="#list-mes" id="list-mes-list" role="tab"
-            data-toggle="list" aria-controls="home">Queries</a>
+            data-toggle="list" aria-controls="home">Contact List</a>
 
         </div><br>
       </div>
@@ -245,11 +221,9 @@ if (isset($_POST['docsub1'])) {
                       <h4 class="StepTitle" style="margin-top: 5%;">Manage Doctors</h4>
 
                       <p class="cl-effect-1">
-                        <a href="#app-hist" onclick="clickDiv('#list-adoc-list ')">Add Doctors</a>
-                        &nbsp|
-                        <a href="#app-hist" onclick="clickDiv('#list-ddoc-list')">
-                          Delete Doctors
-                        </a>
+                        <a href="#app-hist" onclick="clickDiv('#list-adoc-list ')">Add Doctors</a>&nbsp|
+                        <a href="#app-hist" onclick="clickDiv('#list-ddoc-list')">Delete Doctors</a>&nbsp|
+                        <a href="#app-hist" onclick="clickDiv('#list-udoc-list')">Update Doctors</a>
                       </p>
                     </div>
                   </div>
@@ -257,26 +231,18 @@ if (isset($_POST['docsub1'])) {
               </div>
 
 
-
-
             </div>
           </div>
 
 
 
-
-
-
-
-
-
-          <div class="tab-pane fade" id="list-doc" role="tabpanel" aria-labelledby="list-home-list">
+          <div class="tab-pane fade" id="list-doc" role="tabpanel" >
 
 
             <div class="col-md-8">
               <form class="form-group" action="doctorsearch.php" method="post">
                 <div class="row">
-                  <div class="col-md-10"><input type="text" name="doctor_contact" placeholder="Enter Email ID"
+                  <div class="col-md-10"><input type="text" name="username" placeholder="Enter name of doctor"
                       class="form-control"></div>
                   <div class="col-md-2"><input type="submit" name="doctor_search_submit" class="btn btn-primary"
                       value="Search"></div>
@@ -286,68 +252,77 @@ if (isset($_POST['docsub1'])) {
             <table class="table table-hover">
               <thead>
                 <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Avatar</th>
                   <th scope="col">Doctor Name</th>
                   <th scope="col">Specialization</th>
                   <th scope="col">Email</th>
                   <th scope="col">Password</th>
                   <th scope="col">Fees</th>
+                  <th scope="col">Operation</th>
                 </tr>
               </thead>
               <tbody>
                 <?php
                 $con = mysqli_connect("localhost", "root", "", "myhmsdb");
-                global $con;
+                // global $con;
                 $query = "select * from doctb";
                 $result = mysqli_query($con, $query);
-                $result_per_page = 10;
-                $total_results = mysqli_num_rows($result);
-                $number_of_pages = ceil($total_results / $result_per_page);
-                if(!isset($_GET['page'])){
-                    $page = 1;
-                }else{
-                    $page = $_GET['page'];
+                
+                $num = mysqli_num_rows($result);
+                $numberPages = 5;
+                $totalPages = ceil($num / $numberPages);
+                for($btn = 1; $btn <= $totalPages; $btn++){
+                  echo '<button class="btn btn-secondary mx-1 my-3"><a href="admin-panel.php?docpage='.$btn.'"  class="text-white">'.$btn.'</a></button>';
                 }
-                $page_first_result = ($page-1)*$result_per_page;
-                $query = "select * from doctb LIMIT " . $page_first_result . ',' . $result_per_page;
+
+                if(isset($_GET['docpage'])){
+                  $docpage = $_GET['docpage'];
+                }
+                else{
+                  $docpage = 1;
+                }
+
+                $startinglimit = ($docpage - 1) * $numberPages;
+                $query = "select * from doctb limit $startinglimit,$numberPages ";
                 $result = mysqli_query($con, $query);
-                while ($row = mysqli_fetch_array($result)) {
+
+                while ($row = mysqli_fetch_assoc($result)) {
+                  $id = $row['id'];
+                  $image = $row['image'];
                   $username = $row['username'];
                   $spec = $row['spec'];
                   $email = $row['email'];
                   $password = $row['password'];
                   $docFees = $row['docFees'];
 
-                  echo "<tr>
-                        <td>$username</td>
-                        <td>$spec</td>
-                        <td>$email</td>
-                        <td>$password</td>
-                        <td>$docFees</td>
-                      </tr>";
-                }
 
+                  echo "<tr>
+                    <td>$id</td>
+                    <td><img src='img/$row[image]'  width = '60px'  height = '60px'></td>
+                    <td>$username</td>
+                    <td>$spec</td>
+                    <td>$email</td>
+                    <td>$password</td>
+                    <td>$docFees</td>
+                    <td>
+                    <button class='btn btn-success'><a href='./progress/update_doctor.php?id=$row[id]' class='text-white text-capitalize text-decoration-none'>Update</a></button>
+                    <button class='btn btn-danger'><a href='./progress/delete_doctor.php?id=$row[id]' class='text-white text-capitalize text-decoration-none' onclick=\"return confirm('Do you really want to update?')\">Delete</a></button>
+                  </td>
+                  </tr>";
+                }
                 ?>
               </tbody>
             </table>
             <br>
-              <nav aria-label="Page navigation example">
-                  <ul class="pagination">
-                      <?php
-                      for($p=1;$p<=$number_of_pages;$p++){
-                          echo '<li '.(($p==$page)?'class="page-item active"':"page-item").'><a class="page-link" href="admin-panel.php?page=' . $p . '" '.(($p==$page)?'tabIndex="selected"':"").'>' . $p . '</a></li>';
-                      }
-                      ?>
-                  </ul>
-              </nav>
           </div>
-
 
           <div class="tab-pane fade" id="list-pat" role="tabpanel" aria-labelledby="list-pat-list">
 
             <div class="col-md-8">
               <form class="form-group" action="patientsearch.php" method="post">
                 <div class="row">
-                  <div class="col-md-10"><input type="text" name="patient_contact" placeholder="Enter Contact"
+                  <div class="col-md-10"><input type="text" name="fname" placeholder="Enter name of patient"
                       class="form-control"></div>
                   <div class="col-md-2"><input type="submit" name="patient_search_submit" class="btn btn-primary"
                       value="Search"></div>
@@ -373,16 +348,23 @@ if (isset($_POST['docsub1'])) {
                 global $con;
                 $query = "select * from patreg";
                 $result = mysqli_query($con, $query);
-                $result_per_page = 10;
-                $total_results = mysqli_num_rows($result);
-                $number_of_pages = ceil($total_results / $result_per_page);
-                if(!isset($_GET['page'])){
-                    $page = 1;
-                }else{
-                    $page = $_GET['page'];
+
+                $num = mysqli_num_rows($result);
+                $numberPages = 5;
+                $totalPages = ceil($num / $numberPages);
+                for($btn = 1; $btn <= $totalPages; $btn++){
+                  echo '<button class="btn btn-secondary mx-1 my-3"><a href="admin-panel.php?patpage='.$btn.'"  class="text-white">'.$btn.'</a></button>';
                 }
-                $page_first_result = ($page-1)*$result_per_page;
-                $query = "select * from patreg LIMIT " . $page_first_result . ',' . $result_per_page;
+
+                if(isset($_GET['patpage'])){
+                  $patpage = $_GET['patpage'];
+                }
+                else{
+                  $patpage = 1;
+                }
+
+                $startinglimit = ($patpage - 1) * $numberPages;
+                $query = "select * from patreg limit $startinglimit,$numberPages ";
                 $result = mysqli_query($con, $query);
                 while ($row = mysqli_fetch_array($result)) {
                   $pid = $row['pid'];
@@ -408,15 +390,6 @@ if (isset($_POST['docsub1'])) {
               </tbody>
             </table>
             <br>
-              <nav aria-label="Page navigation example">
-                  <ul class="pagination">
-                      <?php
-                      for($p=1;$p<=$number_of_pages;$p++){
-                          echo '<li '.(($p==$page)?'class="page-item active"':"page-item").'><a class="page-link" href="admin-panel.php?page=' . $p . '" '.(($p==$page)?'tabIndex="selected"':"").'>' . $p . '</a></li>';
-                      }
-                      ?>
-                  </ul>
-              </nav>
           </div>
 
 
@@ -449,6 +422,25 @@ if (isset($_POST['docsub1'])) {
                     global $con;
                     $query = "select * from prestb";
                     $result = mysqli_query($con, $query);
+
+                    $num = mysqli_num_rows($result);
+                    $numberPages = 5;
+                    $totalPages = ceil($num / $numberPages);
+                    for($btn = 1; $btn <= $totalPages; $btn++){
+                      echo '<button class="btn btn-secondary mx-1 my-3"><a href="admin-panel.php?prespage='.$btn.'"  class="text-white">'.$btn.'</a></button>';
+                    }
+    
+                    if(isset($_GET['prespage'])){
+                      $prespage = $_GET['prespage'];
+                    }
+                    else{
+                      $prespage = 1;
+                    }
+    
+                    $startinglimit = ($prespage - 1) * $numberPages;
+                    $query = "select * from prestb limit $startinglimit,$numberPages ";
+                    $result = mysqli_query($con, $query);
+
                     while ($row = mysqli_fetch_array($result)) {
                       $doctor = $row['doctor'];
                       $pid = $row['pid'];
@@ -492,7 +484,7 @@ if (isset($_POST['docsub1'])) {
             <div class="col-md-8">
               <form class="form-group" action="appsearch.php" method="post">
                 <div class="row">
-                  <div class="col-md-10"><input type="text" name="app_contact" placeholder="Enter Contact"
+                  <div class="col-md-10"><input type="text" name="fname" placeholder="Enter name of patient"
                       class="form-control"></div>
                   <div class="col-md-2"><input type="submit" name="app_search_submit" class="btn btn-primary"
                       value="Search"></div>
@@ -525,17 +517,26 @@ if (isset($_POST['docsub1'])) {
 
                 $query = "select * from appointmenttb;";
                 $result = mysqli_query($con, $query);
-                $result_per_page = 10;
-                $total_results = mysqli_num_rows($result);
-                $number_of_pages = ceil($total_results / $result_per_page);
-                if(!isset($_GET['page'])){
-                    $page = 1;
-                }else{
-                    $page = $_GET['page'];
+
+
+                $num = mysqli_num_rows($result);
+                $numberPages = 5;
+                $totalPages = ceil($num / $numberPages);
+                for($btn = 1; $btn <= $totalPages; $btn++){
+                  echo '<button class="btn btn-secondary mx-1 my-3"><a href="admin-panel.php?apppage='.$btn.'"  class="text-white">'.$btn.'</a></button>';
                 }
-                $page_first_result = ($page-1)*$result_per_page;
-                $query = "select * from appointmenttb LIMIT " . $page_first_result . ',' . $result_per_page;
+
+                if(isset($_GET['apppage'])){
+                  $apppage = $_GET['apppage'];
+                }
+                else{
+                  $apppage = 1;
+                }
+
+                $startinglimit = ($apppage - 1) * $numberPages;
+                $query = "select * from appointmenttb limit $startinglimit,$numberPages ";
                 $result = mysqli_query($con, $query);
+
                 while ($row = mysqli_fetch_array($result)) {
                   ?>
                   <tr>
@@ -590,25 +591,20 @@ if (isset($_POST['docsub1'])) {
               </tbody>
             </table>
             <br>
-              <nav aria-label="Page navigation example">
-                  <ul class="pagination">
-                      <?php
-                      for($p=1;$p<=$number_of_pages;$p++){
-                          echo '<li '.(($p==$page)?'class="page-item active"':"page-item").'><a class="page-link" href="admin-panel.php?page=' . $p . '" '.(($p==$page)?'tabIndex="selected"':"").'>' . $p . '</a></li>';
-                      }
-                      ?>
-                  </ul>
-              </nav>
           </div>
 
           <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">...</div>
 
           <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">
-            <form class="form-group" method="post" action="./admin-panel.php">
+            <form class="form-group" method="post" action="./progress/create_doctor.php" autocomplete="off"
+              enctype="multipart/form-data">
               <div class="row">
                 <div class="col-md-4"><label>Doctor Name:</label></div>
-                <div class="col-md-8"><input type="text" class="form-control" name="doctor"
+                <div class="col-md-8"><input type="text" class="form-control" name="username"
                     onkeydown="return alphaOnly(event);" required></div><br><br>
+                <div class="col-md-4"><label>Avatar:</label></div>
+                <div class="col-md-8"><input type="file" class="form-control" name="image" accept=".jpg, .jpeg, .png"
+                    value="" required></div><br><br>
                 <div class="col-md-4"><label>Specialization:</label></div>
                 <div class="col-md-8">
                   <select name="special" class="form-control" id="special" required="required">
@@ -620,9 +616,9 @@ if (isset($_POST['docsub1'])) {
                   </select>
                 </div><br><br>
                 <div class="col-md-4"><label>Email ID:</label></div>
-                <div class="col-md-8"><input type="email" class="form-control" name="demail" required></div><br><br>
+                <div class="col-md-8"><input type="email" class="form-control" name="email" required></div><br><br>
                 <div class="col-md-4"><label>Password:</label></div>
-                <div class="col-md-8"><input type="password" class="form-control" onkeyup='check();' name="dpassword"
+                <div class="col-md-8"><input type="password" class="form-control" onkeyup='check();' name="password"
                     id="dpassword" required></div><br><br>
                 <div class="col-md-4"><label>Confirm Password:</label></div>
                 <div class="col-md-8" id='cpass'><input type="password" class="form-control" onkeyup='check();'
@@ -636,19 +632,6 @@ if (isset($_POST['docsub1'])) {
             </form>
           </div>
 
-          <div class="tab-pane fade" id="list-settings1" role="tabpanel" aria-labelledby="list-settings1-list">
-            <form class="form-group" method="post" action="./admin-panel.php">
-              <div class="row">
-
-                <div class="col-md-4"><label>Email ID:</label></div>
-                <div class="col-md-8"><input type="email" class="form-control" name="demail" required></div><br><br>
-
-              </div>
-              <input type="submit" name="docsub1" value="Delete Doctor" class="btn btn-primary"
-                onclick="confirm('do you really want to delete?')">
-            </form>
-          </div>
-
 
           <div class="tab-pane fade" id="list-attend" role="tabpanel" aria-labelledby="list-attend-list">...</div>
 
@@ -657,7 +640,7 @@ if (isset($_POST['docsub1'])) {
             <div class="col-md-8">
               <form class="form-group" action="messearch.php" method="post">
                 <div class="row">
-                  <div class="col-md-10"><input type="text" name="mes_contact" placeholder="Enter Contact"
+                  <div class="col-md-10"><input type="text" name="name" placeholder="Enter Contact"
                       class="form-control"></div>
                   <div class="col-md-2"><input type="submit" name="mes_search_submit" class="btn btn-primary"
                       value="Search"></div>
@@ -682,16 +665,23 @@ if (isset($_POST['docsub1'])) {
 
                 $query = "select * from contact;";
                 $result = mysqli_query($con, $query);
-                $result_per_page = 10;
-                $total_results = mysqli_num_rows($result);
-                $number_of_pages = ceil($total_results / $result_per_page);
-                if(!isset($_GET['page'])){
-                    $page = 1;
-                }else{
-                    $page = $_GET['page'];
+
+                $num = mysqli_num_rows($result);
+                $numberPages = 5;
+                $totalPages = ceil($num / $numberPages);
+                for($btn = 1; $btn <= $totalPages; $btn++){
+                  echo '<button class="btn btn-secondary mx-1 my-3"><a href="admin-panel.php?conpage='.$btn.'#list-mess"  class="text-white">'.$btn.'</a></button>';
                 }
-                $page_first_result = ($page-1)*$result_per_page;
-                $query = "select * from contact LIMIT " . $page_first_result . ',' . $result_per_page;
+
+                if(isset($_GET['conpage'])){
+                  $conpage = $_GET['conpage'];
+                }
+                else{
+                  $conpage = 1;
+                }
+
+                $startinglimit = ($conpage - 1) * $numberPages;
+                $query = "select * from contact limit $startinglimit,$numberPages ";
                 $result = mysqli_query($con, $query);
                 while ($row = mysqli_fetch_array($result)) {
 
@@ -717,17 +707,7 @@ if (isset($_POST['docsub1'])) {
                 <?php } ?>
               </tbody>
             </table>
-              <nav aria-label="Page navigation example">
-                  <ul class="pagination">
-                      <?php
-                      for($p=1;$p<=$number_of_pages;$p++){
-                          echo '<li '.(($p==$page)?'class="page-item active"':"page-item").'><a class="page-link" href="admin-panel.php?page=' . $p . '" '.(($p==$page)?'tabIndex="selected"':"").'>' . $p . '</a></li>';
-                      }
-                      ?>
-                  </ul>
-              </nav>
             <br>
-
           </div>
 
 
@@ -774,6 +754,21 @@ if (isset($_POST['docsub1'])) {
         });
       }
     });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      var link = document.getElementById("list-udoc-list");
+
+      if (link) {
+        link.style.display = "none";
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+
+          window.location.href = link.getAttribute("href");
+        });
+      }
+    });
+
+
 
 
   </script>
